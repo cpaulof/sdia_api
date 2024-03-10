@@ -2,9 +2,15 @@ from flask import Flask, render_template, Response, jsonify
 
 from flask_cors import CORS, cross_origin
 
-from video_feed import VideoCamera
+from video_feed import video_feed
+from telemetry.client import Client
+from recorder import Recorder
 from _mock import DroneData
 
+log_client = Client()
+
+
+recorder = Recorder(video_feed,log_client)
 
 
 app = Flask(__name__)
@@ -14,17 +20,21 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 
 drone_data = DroneData()
 
+
 @app.route('/')
 def index():
     return render_template('index.js')
-def gen(camera):
+def gen(feed):
     while True:
-        frame = camera.get_frame()
+        frame = feed.retrieve()
+        recorder.track()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        
+@cross_origin()        
 @app.route('/video_feed')
-def video_feed():
-    return Response(gen(VideoCamera()),
+def video_feeder():
+    return Response(gen(video_feed),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @cross_origin()
@@ -53,6 +63,25 @@ def get_next_pid():
 @app.route("/pid-frame/<int:frame_id>")
 def get_pid_frame(frame_id):
     return jsonify({"result": frame_id})
+
+
+@cross_origin()
+@app.route("/start_record")
+def start_record():
+    if recorder.is_recording:
+        return jsonify({"result": "already recording"})
+    
+    recorder.start_recording()
+    return jsonify({"result": "started recording"})
+
+@cross_origin()
+@app.route("/stop_record")
+def stop_record():
+    if not recorder.is_recording:
+        return jsonify({"result": "not recording"})
+    recorder.stop_recording()
+    return jsonify({"result": "stoped recording"})
+
 
 
 
