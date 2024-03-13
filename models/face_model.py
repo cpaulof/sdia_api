@@ -25,7 +25,7 @@ class FaceModel:
         detections = inference.from_image_array(image_input, (h, w))
         boxes = detections['boxes']
         scores = detections['scores']
-        boxes = utils.rescale_boxes(boxes, w, h)
+        boxes = utils.rescale_boxes(boxes, w, h, 640)
         final_image = utils.draw_detections(frame, boxes, scores)
         return final_image
 

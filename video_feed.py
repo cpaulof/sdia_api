@@ -14,6 +14,8 @@ from models.rtmp_client import CaptureClient
 from models.face_model import FaceModel
 from models.pid_model import PIDModel
 
+
+
 class VideoFeeder:
     def __init__(self, url, mode, delay_to_frame_rate=False):
         self.url = url
@@ -90,7 +92,7 @@ class VideoFeeder:
           
 
 
-video_feed = VideoFeeder(0, 2)
+video_feed = VideoFeeder("./12-03/DJI_0019.MOV", 3)
 
 def _thread():
     import time

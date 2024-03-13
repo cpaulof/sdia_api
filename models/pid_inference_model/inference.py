@@ -9,7 +9,7 @@ model_path = './models/pid_inference_model/best_ckpt.pt'
 IMG_SHAPE = (960, 960)
 
 class Inference:
-    def __init__(self, conf=0.5, iou=0.2):
+    def __init__(self, conf=0.6, iou=0.2):
         self.initialized = False
         self.detector = None
         self.conf = conf
@@ -31,7 +31,7 @@ class Inference:
     def from_filepath(self, path):
         img = Image.open(path)
         width, height = img.size
-        img = img.resize((640, 640))
+        img = img.resize((960, 960))
         img_array = torch.tensor(np.asarray(img))
         return self.from_image_array(img_array, (width, height))
     

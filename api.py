@@ -11,7 +11,7 @@ log_client = Client()
 
 
 recorder = Recorder(video_feed,log_client)
-
+from telemetry.demo_day_read_log import log_reader
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -40,8 +40,10 @@ def video_feeder():
 @cross_origin()
 @app.route("/drone_data")
 def get_drone_data():
-    drone_data.update_data()
-    data = drone_data.get_data()
+    #drone_data.update_data()
+    #data = drone_data.get_data()
+    log_reader.read(video_feed.capture.frame_index, video_feed.capture.frame_rate)
+    data = log_reader.get_data()
     return jsonify(data)
 
 @cross_origin()
