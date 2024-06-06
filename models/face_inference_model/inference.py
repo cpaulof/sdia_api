@@ -27,7 +27,7 @@ class Inference:
         self.detector = None
 
     def from_filepath(self, path):
-        img = Image.open(path)
+        img = Image.open(path).convert('RGB')
         width, height = img.size
         img = img.resize((640, 640))
         img_array = torch.tensor(np.asarray(img))
@@ -88,4 +88,4 @@ inference = Inference()
     
 if __name__ == '__main__':
     inference.load()
-    print(inference.from_filepath('./test2.jpeg'))
+    print(inference.from_filepath('./test.png'))

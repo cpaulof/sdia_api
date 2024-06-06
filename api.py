@@ -42,8 +42,15 @@ def video_feeder():
 def get_drone_data():
     #drone_data.update_data()
     #data = drone_data.get_data()
-    log_reader.read(video_feed.capture.frame_index, video_feed.capture.frame_rate)
-    data = log_reader.get_data()
+    #################################
+    # DEMONSTRACAO//
+    # EXECUTA API COM UM ARQUIVO DE VIDEO E LOG DE VOO SIMULANDO A
+    # COMUNICAÇÃO COM O DRONE.
+    
+    # log_reader.read(video_feed.capture.frame_index, video_feed.capture.frame_rate)
+    # data = log_reader.get_data()
+    data = {}
+    ######################################
     return jsonify(data)
 
 @cross_origin()

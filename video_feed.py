@@ -95,8 +95,8 @@ class VideoFeeder:
 # arg1 -> URL do servidor RTMP, PATH do arquivo de video ou Indice do dispositivo de captura de video
 # arg2 -> MODO de deteccao (1 - desligado
 #                           2 - deteccao de face
-#                            3 - deteccao de objetos em modo aereo)
-video_feed = VideoFeeder(0, 3)
+#                           3 - deteccao de objetos em modo aereo)
+video_feed = VideoFeeder(0, 2)
 ###################################################
 
 def _thread():
