@@ -5,6 +5,7 @@ import numpy as np
 
 class_names = ['bicycle', 'bus', 'car', 'motorcycle', 'person', 'truck']
 model_path = './models/pid_inference_model/best_ckpt.pt'
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 IMG_SHAPE = (960, 960)
 
@@ -17,7 +18,7 @@ class Inference:
     
     def load(self):
         if not self.initialized:
-            self.detector = Detector(model_path, class_names, 'cuda', conf_thres=self.conf, iou_thres=self.iou)
+            self.detector = Detector(model_path, class_names, device, conf_thres=self.conf, iou_thres=self.iou)
             #self.detector.model.half()
             self.initialized = True
             return True
@@ -57,7 +58,7 @@ class Inference:
     
     def _from_normalized_image(self, array, img_shape):
         array = array[None]
-        array = array.to('cuda')
+        array = array.to(device)
         #print(array.shape)
         import time
         start = time.time()
@@ -70,7 +71,7 @@ class Inference:
 
     def from_normalized_image(self, array, img_shape):
         array = array[None]
-        array = array.to('cuda')
+        array = array.to(device)
         import time
         start = time.time()
         detections = self.detector.forward(array, img_shape)

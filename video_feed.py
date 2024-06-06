@@ -89,10 +89,15 @@ class VideoFeeder:
         if new_mode == 3:
             self.face_model.stop()
             self.pid_model.start()
-          
 
-
-video_feed = VideoFeeder("./12-03/DJI_0019.MOV", 3)
+####################################################         
+# VideoFeeder(arg1, arg2)
+# arg1 -> URL do servidor RTMP, PATH do arquivo de video ou Indice do dispositivo de captura de video
+# arg2 -> MODO de deteccao (1 - desligado
+#                           2 - deteccao de face
+#                            3 - deteccao de objetos em modo aereo)
+video_feed = VideoFeeder(0, 3)
+###################################################
 
 def _thread():
     import time

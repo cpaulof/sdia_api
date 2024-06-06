@@ -4,6 +4,7 @@ from PIL import Image
 import numpy as np
 
 model_path = './models/face_inference_model/model_ckpt.pt'
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 class Inference:
     def __init__(self, conf=0.4, iou=0.2):
@@ -14,7 +15,7 @@ class Inference:
     
     def load(self):
         if not self.initialized:
-            self.detector = Detector(model_path, ['face'] , 'cuda', conf_thres=self.conf, iou_thres=self.iou)
+            self.detector = Detector(model_path, ['face'] , device, conf_thres=self.conf, iou_thres=self.iou)
             #self.detector.model.half()
             self.initialized = True
             return True
@@ -54,7 +55,7 @@ class Inference:
     
     def _from_normalized_image(self, array, img_shape):
         array = array[None]
-        array = array.to('cuda')
+        array = array.to(device)
         #print(array.shape)
         import time
         start = time.time()
@@ -67,7 +68,7 @@ class Inference:
 
     def from_normalized_image(self, array, img_shape):
         array = array[None]
-        array = array.to('cuda')
+        array = array.to(device)
         import time
         start = time.time()
         detections = self.detector.forward(array, img_shape)

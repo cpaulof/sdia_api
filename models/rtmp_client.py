@@ -21,7 +21,7 @@ class CaptureClient:
         self.frame_index = 0
         self.frame_rate = self.cap.get(cv2.CAP_PROP_FPS)
         print(self.frame_rate)
-        frame_time = 1/self.frame_rate
+        frame_time = 1/self.frame_rate if self.frame_rate > 0 else 0
         initial_time = time.time()
         while self.thread_running:
             if self.cap is not None and self.cap.isOpened():
