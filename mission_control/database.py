@@ -4,13 +4,10 @@ from icecream import ic
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, joinedload
 
-from . import models, props
+from mission_control import models, props
 import config
 
-filepath = config.SQLITE_DB_FILEPATH
-filepath = os.path.join(os.getcwd(), filepath)
-URI = r"sqlite:///" + filepath
-ic(URI)
+URI = r"sqlite:///" + os.path.join(config.BASEPATH, config.SQLITE_DB_FILEPATH)
 
 class Database:
     def __init__(self, uri, echo=False):
@@ -105,13 +102,14 @@ class Database:
                     mission.waypoints.append(waypoint_)
                 
                 session.add(mission)
-                session.commit()
-                return True
+                session.flush()
+                return mission.id
 
             except Exception as err:
                 session.rollback()
+                session.close()
                 ic(err)
-                return False
+                return -1
     
     def get_mission_by_id(self, mission_id):
         with Session(self.engine) as session:
