@@ -9,6 +9,10 @@ BUILD_CODES = {
     'BATTERY_LEVEL':                    0x50,
     'SIGNAL_LEVEL':                     0x51,
     'FLIGHT_RECORD':                    (0x61, None), # S <- C
+
+    'START_TAKEOFF':                    (0x70, None),
+    'LANDING_READY':                    (0x71, None),
+    'START_LANDING':                    (0x72, None),
 }
 
 def build_packet(code_name, *args):
