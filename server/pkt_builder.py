@@ -1,7 +1,23 @@
 import struct
 from typing import List
 
+BUILD_CODES = {
+    'HEART_BEAT':                       (0x01, 'heart_beat'), # S <-> C
+    'WAYPOINT_MISSION':                 (0x40, 'waypoint_mission'), # S -> C
+    'WAYPOINT_MISSION_START':           0x41,
+    'WAYPOINT_MISSION_STOP':            0x42,
+    'BATTERY_LEVEL':                    0x50,
+    'SIGNAL_LEVEL':                     0x51,
+    'FLIGHT_RECORD':                    (0x61, None), # S <- C
+}
 
+def build_packet(code_name, *args):
+    code, builder_name = BUILD_CODES[code_name]
+    builder = globals()[builder_name]
+    pkt = builder(*args)
+    return code, pkt
+
+################################# data types ########################################
 def _build_int32(n:int)->bytes:
     assert isinstance(n, int)
     return struct.pack('>i', n)
@@ -33,12 +49,14 @@ def _build_int8(n:int)->bytes:
 def _build_uint8(n:int)->bytes:
     assert isinstance(n, int)
     return struct.pack('B', n)
-    
+
+##########################################################################
+
 def heart_beat(check: bytes) -> bytes:
     assert len(check) == 4
     return check
 
-############################################################################# mission
+################################# mission ##################################
 def _build_waypoint_action(action:List)->bytes:
     assert len(action) == 2
     t, p = action
