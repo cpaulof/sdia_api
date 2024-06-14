@@ -15,5 +15,5 @@ class FlightLogger(BaseLogger):
         # args -> [LATITUDE LONGITUDE ALTITUDE YAW ROLL PITCH VELOCITY_X VELOCITY_Y VELOCITY_Z FLY_TIME]
         timestamp = str(datetime.now())
         lat, lng, alt, yaw, roll, pitch, vx, vy, vz, fly = args
-        return f'{timestamp}\t[{lat}]\t{lng}\t{alt}\t[{yaw}]\t{roll}\t{pitch}\t[{vx}]\t{vy}\t{vz}\t{fly}'
+        return f'{timestamp}\t{lat}\t{lng}\t{alt}\t{yaw}\t{roll}\t{pitch}\t{vx}\t{vy}\t{vz}\t{fly}'
 

@@ -10,6 +10,8 @@ from icecream import ic
 import config
 
 from server import pkt_parser, pkt_builder
+from logger.server_logger import ServerLogger
+import server_events
 
 '''
 Enviando um comando:
@@ -40,6 +42,8 @@ class Client:
         self.is_sending = False
         self.heart_beat = HeartBeat(self)
         self.heart_beat_thread = threading.Thread(target=self.heart_beat.run)
+        self.logger:ServerLogger = server_events.get_logger('server')
+        self.logger_first = True
 
     def send_cmd(self, code_name, *args):
         self.send_queue.append((code_name, args))
@@ -62,6 +66,9 @@ class Client:
             code_name, args = self.send_queue.pop()
             code, pkt = pkt_builder.build_packet(code_name, *args)
             self.send_pkt(code, pkt)
+            if self.logger:
+                self.logger.write(code_name, 'SERVER', len(pkt), 'N/A', new_file=self.logger_first)
+                self.logger_first = False
     
     def send_pkt(self, code, pkt):
         payload = struct.pack('B', code) + pkt
@@ -72,8 +79,19 @@ class Client:
     def recv_loop(self):
         while self.running:           
             pkt = self.read()
+            ic(pkt)
             if pkt is None: break
-            pkt_parser.parse_packet(pkt)
+            try:
+                code, length = pkt_parser.parse_packet(pkt)
+                if self.logger:
+                    self.logger.write(code, 'CLIENT', length, '-', new_file=self.logger_first)
+            except Exception as err:
+                msg = "Error RECV_LOOP: "+repr(err)
+                if self.logger:
+                    self.logger.write(-1, 'CLIENT', 0, msg, new_file=self.logger_first)
+                ic(msg)
+            self.logger_first = False
+
     
     def read(self):
         try:
@@ -119,7 +137,6 @@ class Listener:
         self.client = None
         self.start_server()
         
-
     def start_server(self):
         self.skt = socket.socket()
         self.skt.bind((self.host, self.port))

@@ -9,11 +9,11 @@ class ServerLogger(BaseLogger):
         super(ServerLogger, self).__init__('LOG', 'txt', log_dir)
     
     def header_msg(self):
-        return 'TIMESTAMP\tCODE_NAME\tPACKET_LENGTH\tCLIENT_ADDR'
+        return 'TIMESTAMP\tCODE_NAME\tSOURCE\tLENGTH\tMSG'
     
     def create_msg(self, *args)->str:
-        # args -> [CODE_NAME, packet_length, client_addr]
+        # args -> [CODE_NAME, source, packet_length, msg]
         timestamp = str(datetime.now())
-        code, length, addr = args
-        return f'{timestamp}\t[{code}]\t{length}\t{addr}'
+        code, source, length, msg = args
+        return f'{timestamp}\t[{code}]\t{source}\t{length}\t{msg}'
 

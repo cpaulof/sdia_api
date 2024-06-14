@@ -12,7 +12,8 @@ class BaseLogger:
             os.makedirs(self.abs_log_dir, exist_ok=True)
     
     def get_new_file(self):
-        filename = f'{self.prefix}_{str(datetime.now()).replace(':', '.')}.{self.suffix}'
+        timestamp = str(datetime.now()).replace(':', '.')
+        filename = f"{self.prefix}_{timestamp}.{self.suffix}"
         return open(os.path.join(self.abs_log_dir, filename), 'a')
     
     def get_last_file(self, create_new):

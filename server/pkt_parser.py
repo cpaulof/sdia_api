@@ -1,8 +1,7 @@
 import threading
+import struct
 
 HANDLERS = {
-    0x01: [],
-    0x61: [],
 }
 
 PARSERS_CODE = {
@@ -14,7 +13,9 @@ PARSERS_CODE = {
 }
 
 def add_handler(code:int, func:callable)->None:
-    HANDLERS[code].append(func)
+    handlers = HANDLERS.get(code, [])
+    handlers.append(func)
+    HANDLERS[code] = handlers
 
 def heart_beat_handler(data):
     print('HEART_BEAT', data)
@@ -23,13 +24,21 @@ def parse_packet(pkt):
     code = pkt[0]
     data = pkt[1:]
     handlers = HANDLERS.get(code, [])
+    parser = PARSERS_CODE.get(code)
+    parser_func = globals()[parser]
+    data = parser_func(data)
     for handler in handlers:
         threading.Thread(target=handler, args=(data,)).start()
+    
+    return code, len(data)
 
 
 
 
 ############ parsers ##########################
+def telemetry_data(data):
+    return struct.unpack('>9fI', data)
+
 def heart_beat_parser(data):
     return data
 
