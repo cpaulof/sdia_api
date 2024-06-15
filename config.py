@@ -20,3 +20,16 @@ FLIGHT_LOG_DIR = './logs/flight/'
 SQLITE_DB_FILEPATH = "./SDIA.db"
 
 ##################################
+
+CAPTURE_URL = 'rtmp://127.0.0.1:1935/live'
+RECORDER_DIR = './logs/camera/'
+
+# video
+# image
+RECODER_MODE = 'video'
+
+
+########### det ##############
+DETECTION_CONF = 0.5
+DETECTION_IOU = 0.2
+DETECTION_IMAGE_SIZE = (640, 640)
