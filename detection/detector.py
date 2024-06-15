@@ -30,6 +30,7 @@ class Detector:
         image_input = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image_input = torch.tensor(image_input, dtype=torch.float32)/255.
         image_input = image_input.unsqueeze(0)
+        image_input = image_input.permute(0, 3, 1, 2)
         detections = self.inference_model.from_frame(image_input, (h, w))
         boxes = detections['boxes']
         labels = detections['labels']
@@ -37,15 +38,20 @@ class Detector:
         final_image = utils.draw_detections_with_labels(frame, boxes, labels, self.class_names)
         return final_image
 
-if __name__ == '__main__':
+def main():
+    from PIL import Image
+    import numpy as np
+    from detection.class_names import face_class_names, pid_class_names
+
     def _get_img():
-        from PIL import Image
-        import numpy as np
-        s = Image.open('test.png').convert('RGB')
+        s = Image.open('test2.png').convert('RGB')
         s = np.asarray(s)
         s = cv2.cvtColor(s, cv2.COLOR_BGR2RGB)
         return s
-    from detection.class_names import face_class_names
-
+    
     det = Detector('detection/checkpoints/face_model.pt', face_class_names, _get_img)
-    print(det.run())
+    det.start()
+    img = det.run()
+    f = Image.fromarray(img)
+    f.save('result2.png')
+    print('done')

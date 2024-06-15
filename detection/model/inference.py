@@ -1,5 +1,5 @@
 import torch 
-from hubconf import Detector
+from .hubconf import Detector
 
 import config
 
@@ -28,12 +28,11 @@ class Inference:
         del self.detector
         self.detector = None
     
-    def from_frame(self, frame):
+    def from_frame(self, frame, img_size):
         # 1 - 255 -> -1 - 1
         #frame = torch.tensor(frame/127.5-1.).unsqueeze(0)
         frame = frame.to(device)
-        
-        detections = self.detector.forward(frame, config.DETECTION_IMAGE_SIZE)
+        detections = self.detector.forward(frame, img_size)
         return detections
 
     # def from_filepath(self, path):
@@ -93,9 +92,3 @@ class Inference:
     #         values.append(value_)
 
     #     return dict(zip(keys, values))
-    
-inference = Inference()
-    
-if __name__ == '__main__':
-    inference.load()
-    print(inference.from_filepath('./test.png'))
