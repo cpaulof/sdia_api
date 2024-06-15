@@ -3,6 +3,8 @@ import os
 
 BASEPATH = os.getcwd()
 
+API_HOST = '0.0.0.0'
+API_PORT = 5000
 ############ server ##############
 SERVER_PORT = 3535
 SERVER_HOST = '127.0.0.1'

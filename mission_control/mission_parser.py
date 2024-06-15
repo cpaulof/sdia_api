@@ -35,33 +35,40 @@ def parse_mission_model(mission: models.WaypointMission)->bytes:
     auto_flight_speed = mission.auto_flight_speed
     max_flight_speed = mission.max_flight_speed
     exit_on_signal_lost = mission.exit_on_signal_lost
-    finished_action = mission.finished_action.value
-    flight_path_mode = mission.flight_path_mode.value
-    goto_first_waypoint_mode = mission.goto_first_waypoint_mode.value
-    heading_mode = mission.heading_mode.value
+    finished_action = mission.finished_action.name
+    flight_path_mode = mission.flight_path_mode.name
+    goto_first_waypoint_mode = mission.goto_first_waypoint_mode.name
+    heading_mode = mission.heading_mode.name
     gimbal_pitch_rotation_enabled = mission.gimbal_pitch_rotation_enabled
     repeat_times = mission.repeat_times
     waypoints = []
     for wp in mission.waypoints:
         waypoints.append(parse_waypoint_model(wp))
     
-    return [poi, auto_flight_speed, max_flight_speed, exit_on_signal_lost, finished_action, \
-           flight_path_mode, goto_first_waypoint_mode, heading_mode, \
-           gimbal_pitch_rotation_enabled, repeat_times, waypoints]
+    return {'id': mission.id, 'name': mission.name, 'poi':poi, 'auto_flight_speed':auto_flight_speed,
+            'max_flight_speed':max_flight_speed, 'exit_on_signal_lost':exit_on_signal_lost, 
+            'finished_action': finished_action, 'flight_path_mode':flight_path_mode, 
+            'goto_first_waypoint_mode':goto_first_waypoint_mode, 'heading_mode': heading_mode,
+            'gimbal_pitch_rotation_enabled': gimbal_pitch_rotation_enabled, 
+            'repeat_times': repeat_times, 'waypoints':waypoints}
         
 def parse_waypoint_model(wp):
     latitude = wp.latitude
     longitude = wp.longitude
     altitude = wp.altitude
-    turn_mode = wp.turn_mode.value
+    turn_mode = wp.turn_mode.name
     actions = []
     for action in wp.waypoint_actions:
             actions.append(parse_waypoint_action_model(action))
-    return [latitude, longitude, altitude, turn_mode, actions]
+    return {'latitude': latitude,
+             'longitude':longitude,
+             'altitude': altitude, 
+             'turn_mode': turn_mode, 
+             'actions': actions}
 
 def parse_waypoint_action_model(action):
-    action_type = action.action_type.value
+    action_type = action.action_type.name
     action_param = action.action_param
-    return [action_type, action_param]
+    return {'action_type':action_type, 'action_param':action_param}
 
   

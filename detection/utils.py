@@ -21,10 +21,15 @@ def draw_detections(image, boxes, scores):
 
 def draw_detections_with_labels(image, boxes, labels, class_names):
     image = np.asarray(image)
+    
     for i, box in enumerate(boxes):
+        text = str(class_names[labels[i]])
+        size, p = cv2.getTextSize(text, cv2.FONT_HERSHEY_PLAIN, 1, 1)
+        #print(size, (box[0], box[1]))
         box = [int(i) for i in box]
-        image = cv2.rectangle(image, (box[0], box[1]), (box[2], box[3]), (0, 255, 0), 2, 0)
-        image = cv2.putText(image, str(class_names[labels[i]]), (box[0], box[1]+20), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2, cv2.LINE_AA)
+        image = cv2.rectangle(image, (box[0], box[1]-size[1]-1), (box[0]+size[0], box[1]), (0, 255, 0), -1, 0)
+        image = cv2.rectangle(image, (box[0], box[1]), (box[2], box[3]), (0, 255, 0), 1, 0)
+        image = cv2.putText(image, text, (box[0], box[1]), cv2.FONT_HERSHEY_PLAIN, 1, (255,0,0), 1, cv2.LINE_AA)
     return image
 
 def change_brightness(img, value=30):

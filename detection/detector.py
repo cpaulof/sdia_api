@@ -36,7 +36,7 @@ class Detector:
         labels = detections['labels']
         boxes = utils.rescale_boxes(boxes, w, h, config.DETECTION_IMAGE_SIZE[0])
         final_image = utils.draw_detections_with_labels(frame, boxes, labels, self.class_names)
-        return final_image
+        return cv2.cvtColor(final_image, cv2.COLOR_BGR2RGB)
 
 def main():
     from PIL import Image
@@ -50,6 +50,7 @@ def main():
         return s
     
     det = Detector('detection/checkpoints/face_model.pt', face_class_names, _get_img)
+    #det = Detector('detection/checkpoints/pid_model.pt', pid_class_names, _get_img)
     det.start()
     img = det.run()
     f = Image.fromarray(img)

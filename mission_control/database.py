@@ -4,7 +4,7 @@ from icecream import ic
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session, joinedload
 
-from mission_control import models, props
+from mission_control import models, props, mission_parser
 import config
 
 URI = r"sqlite:///" + os.path.join(config.BASEPATH, config.SQLITE_DB_FILEPATH)
@@ -121,7 +121,14 @@ class Database:
             missions = session.query(models.WaypointMission).limit(amount).offset(page*amount).all()
             return missions
         
-
+    def _serialize_one(self, mission):
+        obj = mission_parser.parse_mission_model(mission)
+        return obj
+    
+    def serialize(self, objs):
+        if isinstance(objs, list):
+            return [self._serialize_one(m) for m in objs]
+        return self._serialize_one(objs)
 
 
 
