@@ -28,6 +28,7 @@ def _recv_until(skt, size, chunk_size=0xFFF):
     while k < size:
         recv_size = min(size-k, chunk_size)
         recv_data = skt.recv(recv_size)
+        ic(recv_data)
         if not recv_data: return b''
         data+=recv_data
         k += recv_size
@@ -118,6 +119,7 @@ class HeartBeat:
     
     def run(self):
         pkt_parser.add_handler(1, self.heart_beat_handler)
+        ic("added heart beat in handlers")
         while self.client.running:
             check = self.gen_check()
             self.current_time = time.time()
@@ -129,12 +131,13 @@ class HeartBeat:
         
 
 class Listener:
-    def __init__(self, host=config.SERVER_HOST, port=config.SERVER_PORT):
+    def __init__(self, server_ev, host=config.SERVER_HOST, port=config.SERVER_PORT):
         self.skt = None
         self.host = host
         self.port = port
         self.listening = True
         self.client = None
+        self.events = server_ev
         self.start_server()
         
     def start_server(self):
@@ -152,16 +155,29 @@ class Listener:
             self.client_skt.close()
         self.skt.close()
 
-    
+    def remove_old_listeners(self):
+        try:
+            func = self.client.heart_beat.heart_beat_handler
+            code, _ = pkt_builder.BUILD_CODES.get('HEART_BEAT', None)
+            if code is None: return
+            try:
+                pkt_parser.HANDLERS[code].remove(func)
+            except ValueError: pass
+            self.events.initialize_default_listeners()
+        except: pass
+
     def listen_loop(self):
         while self.listening:
             try:
                 client_skt, client_addr = self.skt.accept()
+                # remove old listeners
+                old_client = self.client
                 ic(client_skt)
                 self.client_skt = client_skt
                 self.client_addr = client_addr
                 new_client = Client(client_skt)
                 self.client = new_client
+                self.remove_old_listeners(old_client)
                 self.client.run()
                 
             except Exception as err:

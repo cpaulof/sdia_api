@@ -16,6 +16,7 @@ class Recorder:
         self.writer = None
 
     def start_record(self, size, fps, func):
+        if self.recording: return
         self.retrive_frame = func
         self.recording = True
         filename = str(datetime.now()).replace(':', '.')+'.mp4'

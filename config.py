@@ -6,8 +6,9 @@ BASEPATH = os.getcwd()
 API_HOST = '0.0.0.0'
 API_PORT = 5000
 ############ server ##############
-SERVER_PORT = 3535
-SERVER_HOST = '127.0.0.1'
+SERVER_PORT = 6564
+SERVER_VIDEO_FEED_PORT = 6565
+SERVER_HOST = '0.0.0.0'
 SERVER_RETRY = True
 SERVER_LOG_EVENTS = True
 SERVER_LOG_DIR = './logs/server/'
@@ -23,7 +24,7 @@ SQLITE_DB_FILEPATH = "./SDIA.db"
 
 ##################################
 
-CAPTURE_URL = 'rtmp://127.0.0.1:1935/live'
+CAPTURE_URL = "C:\\Users\\copau\\OneDrive\\Desktop\\Projeto DRONE IFMA\\Recording 2024-06-15 155650.mp4"#'rtmp://127.0.0.1:1935/live'
 RECORDER_DIR = './logs/camera/'
 
 # video

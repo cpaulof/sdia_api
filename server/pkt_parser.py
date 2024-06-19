@@ -6,7 +6,17 @@ HANDLERS = {
 
 PARSERS_CODE = {
     0x01: '_no_return_parser',
-    0x61: 'telemetry_data',
+
+    0x61: 'boolean_parser',
+    0x62: 'aircraft_location',
+    0x63: 'float_parser',
+    0x64: 'float_parser',
+    0x65: 'float_parser',
+    0x66: 'double_parser',
+    0x67: 'double_parser',
+    0x68: 'double_parser',
+    0x69: 'int_parser',
+
     0x70: '_no_return_parser',
     0x71: '_no_return_parser',
     0x72: '_no_return_parser',
@@ -41,6 +51,21 @@ def telemetry_data(data):
 
 def heart_beat_parser(data):
     return data
+
+def aircraft_location(data):
+    return struct.unpack('>2d1f', data)
+
+def float_parser(data):
+    return struct.unpack('>f', data)
+
+def double_parser(data):
+    return struct.unpack('>d', data)
+
+def boolean_parser(data):
+    return struct.unpack('>b', data)
+
+def int_parser(data):
+    return struct.unpack('>i', data)
 
 # placeholder 
 def _no_return_parser(data):

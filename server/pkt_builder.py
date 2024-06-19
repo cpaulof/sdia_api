@@ -3,13 +3,23 @@ from typing import List
 
 BUILD_CODES = {
     'HEART_BEAT':                       (0x01, 'heart_beat'), # S <-> C
-    'WAYPOINT_MISSION':                 (0x40, 'waypoint_mission'), # S -> C
-    'WAYPOINT_MISSION_START':           0x41,
-    'WAYPOINT_MISSION_STOP':            0x42,
-    'BATTERY_LEVEL':                    0x50,
-    'SIGNAL_LEVEL':                     0x51,
-    'FLIGHT_RECORD':                    (0x61, None), # S <- C
+    'WAYPOINT_MISSION':                 (0x10, 'waypoint_mission'), # S -> C
+    'WAYPOINT_MISSION_START':           (0x11, None),
+    'WAYPOINT_MISSION_STOP':            (0x12, None),
+    # 'BATTERY_LEVEL':                    0x50,
+    # 'SIGNAL_LEVEL':                     0x51,
+    ################################
+    'IS_FLYING':                        (0x61, None),
+    'AIRCRAFT_LOCATION':                (0x62, None), 
+    'VELOCITY_X':                       (0x63, None), 
+    'VELOCITY_Y':                       (0x64, None), 
+    'VELOCITY_Z':                       (0x65, None),
 
+    'ATTITUDE_PITCH':                   (0x66, None), 
+    'ATTITUDE_YAW':                     (0x67, None), 
+    'ATTITUDE_ROLL':                    (0x68, None),
+    'FLY_TIME_IN_SECONDS':              (0x69, None),
+    ###################################
     'START_TAKEOFF':                    (0x70, None),
     'LANDING_READY':                    (0x71, None),
     'START_LANDING':                    (0x72, None),

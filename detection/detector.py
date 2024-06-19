@@ -23,6 +23,7 @@ class Detector:
     
     def run(self):
         frame = self.frame_retriever()
+        if frame is None: return frame
         #frame = utils.change_brightness(frame, -100)
         if not self.inference_model.initialized: return frame
         h, w = frame.shape[:2]

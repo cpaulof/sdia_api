@@ -10,17 +10,20 @@ class Capture:
         self.cap = None
         self.running = False
         self.last_capture_time = None
-        self.frame_rate = 0
+        self.frame_time = 0
         self.frame = None
+        self.frame_rate = 30
     
     def start(self):
+        if self.running == True:
+            return ic('\nalready running, call stop first')
         self.running = True # START
-        ic('\nSTART CAPTURE')
         self.cap = cv2.VideoCapture(self.url)
         self.last_capture_time = time.time()
-
+        self.frame_rate = self.cap.get(cv2.CAP_PROP_FPS)
         self.thread = threading.Thread(target=self.run)
         self.thread.start()
+        return ic('\nSTART CAPTURE')
     
     def retrieve(self):
         return self.frame
@@ -28,9 +31,14 @@ class Capture:
     def capture(self):
         if self.cap is None and self.cap.isOpened(): return None
         now = time.time()
-        self.frame_rate = int(1./max(now - self.last_capture_time, 0.0001))
+        self.frame_time = int(1./max(now - self.last_capture_time, 0.0001))
         self.last_capture_time = now
-        frame, _ = self.cap.read()
+        _, frame = self.cap.read()
+        diff = 1/self.frame_rate - (time.time()-self.last_capture_time)
+        diff = max(0, diff)
+        diff = min(1/self.frame_rate, diff)
+        if diff > 0:
+            time.sleep(diff)
         return frame
 
     def run(self):
@@ -43,6 +51,6 @@ class Capture:
     
     def stop(self):
         self.running = False
-        ic('\nSTOP CAPTURE')
+        return ic('\nSTOP CAPTURE')
 
 

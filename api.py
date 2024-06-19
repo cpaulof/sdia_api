@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, jsonify, request
+from flask import Flask, render_template, Response, jsonify, request, make_response
 
 from flask_cors import CORS, cross_origin
 
@@ -35,7 +35,7 @@ def index():
 def status():
     return main_instance.server_status
 
-@app.route('/missions/')
+@app.route('/missions')
 def missions():
     amount = 10
     page = 0
@@ -45,22 +45,48 @@ def missions():
     except: pass
     return main_instance.get_missions(amount, page)
 
-@app.route('/telemetry/')
+@app.route('/telemetry')
 def telemetry():
     return main_instance.telemetry_data
 
-# def gen(feed):
-#     while True:
-#         frame = feed.retrieve()
-#         recorder.track()
-#         yield (b'--frame\r\n'
-#                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+@app.route('/camera')
+def camera():
+    d = main_instance.get_frame()
+    if d is None: return ''
+    r = make_response(d)
+    r.headers.set('Content-Type', 'image/jpeg')
+    return r
+
+@app.route('/start_capture')
+def start_capture():
+    return main_instance.start_capture()
+
+@app.route('/stop_capture')
+def stop_capture():
+    return main_instance.stop_capture()
+
+@app.route('/change_detection_mode')
+def change_detection_mode():
+    mode = None
+    try:
+        mode = request.args.get('mode', mode)
+    except:
+        pass
+    main_instance.change_detection_mode(mode)
+    return 'OK'
+
+def get_det(func):
+    while True:
+        frame = func()
+        if frame is None: return b''
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
         
-# @cross_origin()        
-# @app.route('/video_feed')
-# def video_feeder():
-#     return Response(gen(video_feed),
-#                     mimetype='multipart/x-mixed-replace; boundary=frame')
+     
+@app.route('/video_feed')
+def video_feeder():
+    return Response(get_det(main_instance.get_detection),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 # @cross_origin()
 # @app.route("/drone_data")
