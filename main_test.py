@@ -98,13 +98,51 @@ def test_parse_mission():
     mission_id = 14
     from mission_control import database
     from server import pkt_builder
+    import struct
     db = database.Database(database.URI)
     m = db.get_mission_by_id(mission_id)
     ic(m)
 
     mission_data = ic(pkt_builder.parse_mission(m))
 
-    ic(pkt_builder.waypoint_mission(mission_data))
+    pkt = ic(pkt_builder.waypoint_mission(mission_data))
+    
+    def test_client_mission_pkt_decode(pkt):
+        poi_length = pkt[:4]
+        poi_length, = struct.unpack('>I', poi_length)
+        i = 4
+        ic(poi_length)
+        poi = b''
+        for k in range(i, i+poi_length):
+            poi+=pkt[k:k+1]
+        i+=poi_length
+        ic(poi)
+        fmt = '>2f?4B?B'
+        size = struct.calcsize(fmt)
+        params = struct.unpack(fmt, pkt[i:i+size])
+        i+=size
+        ic(params)
+        wp_count, = struct.unpack('>B', pkt[i:i+1])
+        ic(wp_count)
+        i+=1
+        for k in range(wp_count):
+            fmt = '>3f2B'
+            size = struct.calcsize(fmt)
+            wp_params = struct.unpack(fmt, pkt[i:i+size])
+            i+=size
+            ic(wp_params)
+            action_count = wp_params[-1]
+            for j in range(action_count):
+                fmt = '>Bi'
+                size = struct.calcsize(fmt)
+                action_params = struct.unpack(fmt, pkt[i:i+size])
+                i+=size
+                ic(action_params)
+        
+
+    test_client_mission_pkt_decode(pkt)
+
+
 
 
 test_parse_mission()

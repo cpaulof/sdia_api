@@ -75,8 +75,8 @@ def heart_beat(check: bytes) -> bytes:
 def _build_waypoint_action(action:List)->bytes:
     assert len(action) == 2
     t, p = action
-    print(action)
-    return _build_uint8(t)+_build_uint8(p)
+    #print(action)
+    return _build_uint8(t)+_build_int32(p) # param is not uint8 since Type Gimbal Pitch accepts param between -180 to +180
 
 def _build_waypoint(wp:List)->bytes:
     assert len(wp) == 5
@@ -114,7 +114,7 @@ def waypoint_mission(mission: list) -> bytes:
         1 byte (uint8)          -> waypoint actions count (K)
             < K vezes >
             1 byte (uint8)      -> action type
-            1 byte (uint8)      -> action param
+            4 byte (int32)      -> action param
     '''
     assert len(mission) == 11
     poi, speed, max_speed, eosl, end_action, fpm, goto_mode, heading, gpre, repeats, waypoints = mission
