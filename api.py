@@ -45,6 +45,10 @@ def missions():
     except: pass
     return main_instance.get_missions(amount, page)
 
+
+
+
+
 @app.route('/telemetry')
 def telemetry():
     return main_instance.telemetry_data
@@ -144,9 +148,40 @@ def video_feeder():
 #     recorder.stop_recording()
 #     return jsonify({"result": "stoped recording"})
 
+@app.route("/mission/status")
+def get_mission_execution_state():
+    pass
 
+@app.route("/mission/start")
+def get_mission_execution_state():
+    pass
 
+@app.route("/mission/stop")
+def get_mission_execution_state():
+    pass
 
+@app.route("/mission/load")
+def load_mission():
+    try:
+        mission_id = int(request.args.get('id', -1))
+        main_instance.load_mission(mission_id)
+    except:
+        pass
+    return {}
+
+@app.route("/mission", methods=['GET', 'POST'])
+def create_mission():
+    if request.method == "GET":
+        r = main_instance.mission_database.get_mission_by_id(int(request.args.get('id', -1)))
+        if r is not None:
+            return main_instance.mission_database.serialize(r)
+    else:
+        json = request.json
+        print(json)
+        r = main_instance.mission_database.add_waypoint_mission(**json)
+        print(r)
+        return {'mission_id':r}
+    return {'error':'-'}
 
 def start():
     if main_instance is not None:

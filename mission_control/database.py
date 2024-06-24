@@ -18,21 +18,21 @@ class Database:
     def create_mission(self, name, poi, afs, mfs, eosl, end_action, fpm, goto_mode, heading, gpre, repeats):
         mission = None
         try:
-            assert len(poi.split(':')) == 2
-            assert isinstance(repeats, int) and repeats >= 1
-            assert all([isinstance(i, str) for i in (end_action, fpm, goto_mode, heading)])
-            assert all([isinstance(i, float) and i>0.0 for i in (afs, mfs)])
+            assert len(poi.split(':')) == 2, "POI not valid"
+            assert isinstance(repeats, int) and repeats >= 1, "repeats not valid"
+            assert all([isinstance(i, int) for i in (end_action, fpm, goto_mode, heading)]), "Enumerators not valid"
+            assert all([isinstance(i, (float, int)) and i>0.0 for i in (afs, mfs)]), "flight speeds not valid"
 
             mission = models.WaypointMission(
                 name=name,
                 point_of_interest = poi,
-                auto_flight_speed = afs,
-                max_flight_speed = mfs,
+                auto_flight_speed = float(afs),
+                max_flight_speed = float(mfs),
                 exit_on_signal_lost = eosl,
-                finished_action = props.WaypointMissionFinishedAction[end_action],
-                flight_path_mode = props.WaypointMissionFlightPathMode[fpm],
-                goto_first_waypoint_mode = props.WaypointMissionGotoWaypointMode[goto_mode],
-                heading_mode = props.WaypointMissionHeadingMode[heading],
+                finished_action = props.WaypointMissionFinishedAction(end_action),
+                flight_path_mode = props.WaypointMissionFlightPathMode(fpm),
+                goto_first_waypoint_mode = props.WaypointMissionGotoWaypointMode(goto_mode),
+                heading_mode = props.WaypointMissionHeadingMode(heading),
                 gimbal_pitch_rotation_enabled = gpre,
                 repeat_times = repeats
             )
@@ -44,16 +44,16 @@ class Database:
     def create_waypoint(self, mission, lat, lng, alt, turn_mode):
         wp = None
         try:
-            assert isinstance(lat, float)
-            assert isinstance(lng, float)
-            assert isinstance(alt, float)
-            assert isinstance(turn_mode, str)
+            assert isinstance(lat, float), "latitude not valid"
+            assert isinstance(lng, float), "longitude not valid"
+            assert isinstance(alt, (float, int)), "altitude not valid"
+            assert isinstance(turn_mode, int), "Turn mode notvalid"
 
             wp = models.Waypoint(waypoint_mission_id = mission.id,
                                  latitude=lat,
                                  longitude=lng,
-                                 altitude=alt,
-                                 turn_mode=props.WaypointTurnMode[turn_mode])
+                                 altitude=float(alt),
+                                 turn_mode=props.WaypointTurnMode(turn_mode))
 
         except Exception as err:
             ic(err)
@@ -63,11 +63,11 @@ class Database:
     def create_waypoint_action(self, waypoint, action_type, action_param):
         action = None
         try:
-            assert isinstance(action_type, str)
+            assert isinstance(action_type, int)
             assert isinstance(action_param, int)
 
             action = models.WaypointAction(waypoint_id=waypoint.id,
-                                           action_type=props.WaypointActionType[action_type], 
+                                           action_type=props.WaypointActionType(action_type), 
                                            action_param=action_param)
         except Exception as err:
             ic(err)
@@ -79,24 +79,24 @@ class Database:
             try:
                 mission = self.create_mission(
                     kw['name'],
-                    kw['poi'],
-                    kw['afs'],
-                    kw['mfs'],
-                    kw['eosl'],
-                    kw['end_action'],
-                    kw['fpm'],
-                    kw['goto_mode'],
-                    kw['heading'],
-                    kw['gpre'],
-                    kw['repeats'])
+                    kw['point_of_interest'],
+                    kw['auto_flight_speed'],
+                    kw['max_flight_speed'],
+                    kw['exit_on_signal_lost'],
+                    kw['finished_action'],
+                    kw['flight_path_mode'],
+                    kw['goto_first_waypoint_mode'],
+                    kw['heading_mode'],
+                    kw['gimbal_pitch_rotation_enabled'],
+                    kw['repeat_times'])
                 assert mission is not None, 'Mission params not valid'
 
                 waypoints = kw['waypoints']
                 for wp in waypoints:
-                    waypoint_ = self.create_waypoint(mission, wp['lat'], wp['lng'], wp['alt'], wp['turn_mode'])
+                    waypoint_ = self.create_waypoint(mission, wp['latitude'], wp['longitude'], wp['altitude'], wp['turn_mode'])
                     assert waypoint_ is not None, 'Waypoint params not valid'
-                    for act in wp['actions']:
-                        action_ = self.create_waypoint_action(waypoint_, act['type'], act['param'])
+                    for act in wp['waypoint_actions']:
+                        action_ = self.create_waypoint_action(waypoint_, act['action_type'], act['action_param'])
                         assert action_ is not None, 'Action params not valid'
                         waypoint_.waypoint_actions.append(action_)
                     mission.waypoints.append(waypoint_)

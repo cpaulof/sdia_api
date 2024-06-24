@@ -115,6 +115,11 @@ class Main:
         missions = self.mission_database.get_mission_list(amount, page)
         return self.mission_database.serialize(missions)
     
+    #mission exec
+    def load_mission(self, mission_id):
+        m = self.mission_database.get_mission_by_id(mission_id)
+        if m is None: return
+        
     
     
 
