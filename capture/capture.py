@@ -1,6 +1,7 @@
 import threading
 import cv2
 import time
+from copy import deepcopy
 
 from icecream import ic
 
@@ -13,6 +14,7 @@ class Capture:
         self.frame_time = 0
         self.frame = None
         self.frame_rate = 30
+        self.freezed_frame = None
     
     def start(self):
         if self.running == True:
@@ -26,10 +28,10 @@ class Capture:
         return ic('\nSTART CAPTURE')
     
     def retrieve(self):
-        return self.frame
+        return deepcopy(self.frame)
     
     def capture(self):
-        if self.cap is None and self.cap.isOpened(): return None
+        if self.cap is None or not self.cap.isOpened(): return None
         now = time.time()
         self.frame_time = int(1./max(now - self.last_capture_time, 0.0001))
         self.last_capture_time = now
@@ -48,9 +50,11 @@ class Capture:
                 self.stop()
         
         self.cap = None
+        self.frame = self.freezed_frame
     
     def stop(self):
         self.running = False
+        self.freezed_frame = deepcopy(self.frame)
         return ic('\nSTOP CAPTURE')
 
 

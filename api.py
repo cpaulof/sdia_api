@@ -52,7 +52,7 @@ def telemetry():
 @app.route('/camera')
 def camera():
     d = main_instance.get_frame()
-    if d is None: return ''
+    if d is None: return make_response("No Feed", 400)
     r = make_response(d)
     r.headers.set('Content-Type', 'image/jpeg')
     return r
@@ -78,13 +78,15 @@ def change_detection_mode():
 def get_det(func):
     while True:
         frame = func()
-        if frame is None: return b''
+        if frame is None: return Response('No Feed', status=400)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
         
      
 @app.route('/video_feed')
 def video_feeder():
+    if main_instance.get_detection() is None:
+        return Response('No Feed', status=400)
     return Response(get_det(main_instance.get_detection),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 

@@ -37,7 +37,7 @@ class Detector:
         labels = detections['labels']
         boxes = utils.rescale_boxes(boxes, w, h, config.DETECTION_IMAGE_SIZE[0])
         final_image = utils.draw_detections_with_labels(frame, boxes, labels, self.class_names)
-        return cv2.cvtColor(final_image, cv2.COLOR_BGR2RGB)
+        return final_image
 
 def main():
     from PIL import Image
