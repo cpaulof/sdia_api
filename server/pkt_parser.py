@@ -7,6 +7,8 @@ HANDLERS = {
 PARSERS_CODE = {
     0x01: '_no_return_parser',
 
+    0x13: 'mission_status_parser',
+
     0x61: 'boolean_parser',
     0x62: 'aircraft_location',
     0x63: 'float_parser',
@@ -46,6 +48,9 @@ def parse_packet(pkt):
 
 
 ############ parsers ##########################
+def mission_status_parser(data):
+    return data
+
 def telemetry_data(data):
     return struct.unpack('>9fI', data)
 

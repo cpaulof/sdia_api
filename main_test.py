@@ -103,9 +103,8 @@ def test_parse_mission():
     m = db.get_mission_by_id(mission_id)
     ic(m)
 
-    mission_data = ic(pkt_builder.parse_mission(m))
-
-    pkt = ic(pkt_builder.waypoint_mission(mission_data))
+    code, pkt = pkt_builder.build_packet('WAYPOINT_MISSION', m)
+    ic(pkt, type(pkt))
     
     def test_client_mission_pkt_decode(pkt):
         poi_length = pkt[:4]
@@ -141,6 +140,21 @@ def test_parse_mission():
         
 
     test_client_mission_pkt_decode(pkt)
+
+    def send_pkt(code, pkt):
+        payload = struct.pack('B', code) + pkt
+        payload_length = len(payload)
+        data = struct.pack(f">I", payload_length) + payload
+        return data
+    
+    def send_cmd(code_name, *args):
+        return (code_name, args)
+    
+    code, pkt = ic(pkt_builder.build_packet('WAYPOINT_MISSION_START'))
+
+    ic(send_pkt(code, pkt))
+
+    ic(send_cmd('CMD'))
 
 
 

@@ -149,25 +149,29 @@ def video_feeder():
 #     return jsonify({"result": "stoped recording"})
 
 @app.route("/mission/status")
-def get_mission_execution_state():
-    pass
+def get_mission_execution_status():
+    return main_instance.mission_status
 
 @app.route("/mission/start")
-def get_mission_execution_state():
-    pass
+def mission_start():
+    msg = main_instance.start_mission()
+    return {'msg':msg}
 
 @app.route("/mission/stop")
-def get_mission_execution_state():
-    pass
+def mission_stop():
+    msg = main_instance.stop_mission()
+    return {'msg':msg}
 
 @app.route("/mission/load")
 def load_mission():
+    msg = 'failed to get mission from database'
     try:
         mission_id = int(request.args.get('id', -1))
-        main_instance.load_mission(mission_id)
+        msg_ = main_instance.load_mission(mission_id)
+        msg = msg_ or msg
     except:
         pass
-    return {}
+    return {'msg':msg}
 
 @app.route("/mission", methods=['GET', 'POST'])
 def create_mission():

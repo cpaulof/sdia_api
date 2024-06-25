@@ -88,6 +88,13 @@ class ServerEvents:
         self.add_listener('START_TAKEOFF', lambda _:self.drone_status.update([('FLYING', True)]))
         self.add_listener('START_LANDING', lambda _:self.drone_status.update([('FLYING', False)]))
         self.add_listener('START_LANDING', lambda _:setattr(self, 'telemetry_logger_header', True))
+
+        def _list_key_updater(key, data):
+            l = self.KEYS.get(key, [])
+            l.append(data)
+            self.KEYS.update([(key, l)])
+
+        self.add_listener('WAYPOINT_MISSION_STATUS', lambda data:_list_key_updater('WAYPOINT_MISSION_STATUS', data))
     ################
     def check_server_status(self):
         if self.server is None:

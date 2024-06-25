@@ -10,7 +10,9 @@ from detection.detector import Detector
 from detection.class_names import pid_class_names, face_class_names
 
 from server_events import ServerEvents
+from server import pkt_builder
 
+from icecream import ic
 import api
 
 import config
@@ -119,7 +121,30 @@ class Main:
     def load_mission(self, mission_id):
         m = self.mission_database.get_mission_by_id(mission_id)
         if m is None: return
-        
+        try:
+            self.server_events.server.client.send_cmd('WAYPOINT_MISSION', m)
+            return ic('[LOAD_MISSION] - CMD SENT TO QUEUE')
+        except:
+            return 'no client connected'
+    
+    def start_mission(self):
+        try:
+            self.server_events.server.client.send_cmd('WAYPOINT_MISSION_START')
+            return ic('[START_MISSION] - CMD SENT TO QUEUE')
+        except:
+            return 'no client connected'
+    
+    def stop_mission(self):
+        try:
+            self.server_events.server.client.send_cmd('WAYPOINT_MISSION_STOP')
+            return ic('[STOP_MISSION] - CMD SENT TO QUEUE')
+        except:
+            return 'no client connected'
+    
+    @property
+    def mission_status(self):
+        return self.server_events.KEYS.get('WAYPOINT_MISSION_STATUS', [])
+
     
     
 

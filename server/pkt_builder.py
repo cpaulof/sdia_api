@@ -5,8 +5,9 @@ from typing import List
 BUILD_CODES = {
     'HEART_BEAT':                       (0x01, 'heart_beat'), # S <-> C
     'WAYPOINT_MISSION':                 (0x10, 'waypoint_mission'), # S -> C
-    'WAYPOINT_MISSION_START':           (0x11, None),
-    'WAYPOINT_MISSION_STOP':            (0x12, None),
+    'WAYPOINT_MISSION_START':           (0x11, 'no_data_cmd'),
+    'WAYPOINT_MISSION_STOP':            (0x12, 'no_data_cmd'),
+    'WAYPOINT_MISSION_STATUS':          (0x13, None),
     # 'BATTERY_LEVEL':                    0x50,
     # 'SIGNAL_LEVEL':                     0x51,
     ################################
@@ -66,6 +67,8 @@ def _build_uint8(n:int)->bytes:
     return struct.pack('B', n)
 
 ##########################################################################
+def no_data_cmd(*args):
+    return b''
 
 def heart_beat(check: bytes) -> bytes:
     assert len(check) == 4
@@ -91,7 +94,7 @@ def _build_waypoint(wp:List)->bytes:
     return r
 
 
-def waypoint_mission(mission: list) -> bytes:
+def waypoint_mission(mission) -> bytes:
     '''
     Estrutura do pacote:
     4 bytes (uint32)            -> tamanho da string POI (N)
@@ -116,8 +119,9 @@ def waypoint_mission(mission: list) -> bytes:
             1 byte (uint8)      -> action type
             4 byte (int32)      -> action param
     '''
-    assert len(mission) == 11
-    poi, speed, max_speed, eosl, end_action, fpm, goto_mode, heading, gpre, repeats, waypoints = mission
+    mission_list = parse_mission(mission)
+    assert len(mission_list) == 11
+    poi, speed, max_speed, eosl, end_action, fpm, goto_mode, heading, gpre, repeats, waypoints = mission_list
     r = _build_string(poi)
     r+= _build_float(speed)
     r+= _build_float(max_speed)
