@@ -156,15 +156,15 @@ class Listener:
         self.skt.close()
 
     def remove_old_listeners(self):
-        try:
-            func = self.client.heart_beat.heart_beat_handler
-            code, _ = pkt_builder.BUILD_CODES.get('HEART_BEAT', None)
-            if code is None: return
-            try:
-                pkt_parser.HANDLERS[code].remove(func)
-            except ValueError: pass
-            self.events.initialize_default_listeners()
-        except: pass
+        # try:
+        #     func = self.client.heart_beat.heart_beat_handler
+        #     code, _ = pkt_builder.BUILD_CODES.get('HEART_BEAT', None)
+        #     try:
+        #         pkt_parser.HANDLERS[code].remove(func)
+        #     except ValueError: pass
+            
+        # except: pass
+        pkt_parser.HANDLERS = {}
 
     def listen_loop(self):
         while self.listening:
@@ -177,8 +177,10 @@ class Listener:
                 self.client_addr = client_addr
                 new_client = Client(client_skt)
                 self.client = new_client
-                self.remove_old_listeners(old_client)
+                self.remove_old_listeners()
+                self.events.initialize_default_listeners()
                 self.client.run()
+                
                 
             except Exception as err:
                 print('Error:', err)

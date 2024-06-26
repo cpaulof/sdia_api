@@ -107,14 +107,13 @@ def test_parse_mission():
     ic(pkt, type(pkt))
     
     def test_client_mission_pkt_decode(pkt):
-        poi_length = pkt[:4]
-        poi_length, = struct.unpack('>I', poi_length)
-        i = 4
-        ic(poi_length)
-        poi = b''
-        for k in range(i, i+poi_length):
-            poi+=pkt[k:k+1]
-        i+=poi_length
+        #poi_length = pkt[:4]
+        #poi_length, = struct.unpack('>I', poi_length)
+        i = 0
+        fmt = '>2d'
+        size = struct.calcsize(fmt)
+        poi = struct.unpack(fmt, pkt[i:i+size])
+        i+=size
         ic(poi)
         fmt = '>2f?4B?B'
         size = struct.calcsize(fmt)
@@ -125,7 +124,7 @@ def test_parse_mission():
         ic(wp_count)
         i+=1
         for k in range(wp_count):
-            fmt = '>3f2B'
+            fmt = '>2df2B'
             size = struct.calcsize(fmt)
             wp_params = struct.unpack(fmt, pkt[i:i+size])
             i+=size

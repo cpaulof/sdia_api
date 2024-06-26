@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import List
 from typing import Optional
 from sqlalchemy import ForeignKey
-from sqlalchemy import String, Integer, Boolean, Float, DateTime,  Enum
+from sqlalchemy import String, Integer, Boolean, Float, DateTime, Enum, Double
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -40,8 +40,8 @@ class Waypoint(Base):
     __tablename__ = 'waypoint'
     id: Mapped[int] = mapped_column(primary_key=True)
     waypoint_mission_id: Mapped[int]  = mapped_column(ForeignKey('waypoint_mission.id'))
-    latitude: Mapped[float]
-    longitude: Mapped[float]
+    latitude: Mapped[float] = mapped_column(Double())
+    longitude: Mapped[float] = mapped_column(Double())
     altitude: Mapped[float]
     turn_mode: Mapped[int] = mapped_column(Enum(props.WaypointTurnMode), default=props.WaypointTurnMode.CLOCKWISE)
     

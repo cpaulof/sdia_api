@@ -8,6 +8,10 @@ BUILD_CODES = {
     'WAYPOINT_MISSION_START':           (0x11, 'no_data_cmd'),
     'WAYPOINT_MISSION_STOP':            (0x12, 'no_data_cmd'),
     'WAYPOINT_MISSION_STATUS':          (0x13, None),
+    'WAYPOINT_MISSION_EXECUTION_STATUS':(0x14, None),
+    'WAYPOINT_MISSION_UPLOAD_RESULT':   (0x15, None),
+    'WAYPOINT_MISSION_PAUSE':           (0x16, None),
+    'WAYPOINT_MISSION_RESUME':          (0x17, None),
     # 'BATTERY_LEVEL':                    0x50,
     # 'SIGNAL_LEVEL':                     0x51,
     ################################
@@ -45,6 +49,10 @@ def _build_uint32(n:int)->bytes:
 def _build_float(n:float)->bytes:
     assert isinstance(n, float)
     return struct.pack('>f', n)
+
+def _build_double(n:float)->bytes:
+    assert isinstance(n, float)
+    return struct.pack('>d', n)
 
 def _build_string(n:str|bytes)->bytes:
     assert isinstance(n, (str, bytes))
@@ -84,8 +92,8 @@ def _build_waypoint_action(action:List)->bytes:
 def _build_waypoint(wp:List)->bytes:
     assert len(wp) == 5
     lat, lng, alt, turn_mode, actions = wp
-    r = _build_float(lat)
-    r+= _build_float(lng)
+    r = _build_double(lat)
+    r+= _build_double(lng)
     r+= _build_float(alt)
     r+= _build_uint8(turn_mode)
     r+= _build_uint8(len(actions))
@@ -97,8 +105,10 @@ def _build_waypoint(wp:List)->bytes:
 def waypoint_mission(mission) -> bytes:
     '''
     Estrutura do pacote:
-    4 bytes (uint32)            -> tamanho da string POI (N)
-    N bytes (string)            -> string POI
+    # 4 bytes (uint32)          -> tamanho da string POI (N)
+    # N bytes (string)          -> string POI
+    8 bytes (float64)           -> poi_lat
+    8 bytes (float64)           -> poi_lng
     4 bytes (float32)           -> auto flight speed
     4 bytes (float32)           -> max flight speed
     1 byte (bool)               -> end on signal lost 
@@ -110,8 +120,8 @@ def waypoint_mission(mission) -> bytes:
     1 byte (uint8)              -> mission repeats
     1 byte (uint8)              -> waypoints count (M)
         < M vezes >
-        4 bytes (float32)       -> latitude
-        4 bytes (float32)       -> longitude
+        8 bytes (float64)       -> latitude
+        8 bytes (float64)       -> longitude
         4 bytes (float32)       -> altitude
         1 byte (uint8)          -> turn mode
         1 byte (uint8)          -> waypoint actions count (K)
@@ -122,7 +132,10 @@ def waypoint_mission(mission) -> bytes:
     mission_list = parse_mission(mission)
     assert len(mission_list) == 11
     poi, speed, max_speed, eosl, end_action, fpm, goto_mode, heading, gpre, repeats, waypoints = mission_list
-    r = _build_string(poi)
+    poi_lat, poi_lng = [float(i) for i in poi.split(':')]
+    #r = _build_string(poi)
+    r = _build_double(poi_lat)
+    r+= _build_double(poi_lng)
     r+= _build_float(speed)
     r+= _build_float(max_speed)
     r+= _build_bool(eosl)

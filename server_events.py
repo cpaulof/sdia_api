@@ -93,8 +93,12 @@ class ServerEvents:
             l = self.KEYS.get(key, [])
             l.append(data)
             self.KEYS.update([(key, l)])
-
+        #WAYPOINT_MISSION_UPLOAD_RESULT
         self.add_listener('WAYPOINT_MISSION_STATUS', lambda data:_list_key_updater('WAYPOINT_MISSION_STATUS', data))
+        self.add_listener('WAYPOINT_MISSION_UPLOAD_RESULT', lambda data:self.KEYS.update([('WAYPOINT_MISSION_UPLOAD_RESULT', data[0])]))
+
+
+        ic('-------------- END INIT LISTENERS --------------')
     ################
     def check_server_status(self):
         if self.server is None:
@@ -121,6 +125,7 @@ class ServerEvents:
     def remove_all_listeners(self):
         for code_name, func in self.listeners:
             self.remove_listener(code_name, func)
+        self.listeners = []
 
     def add_listener(self, code_name, callback):
         code, _ = pkt_builder.BUILD_CODES.get(code_name, None)
@@ -133,7 +138,7 @@ class ServerEvents:
         if code is None: return
         try:
             pkt_parser.HANDLERS[code].remove(callback)
-        except ValueError: pass
+        except (ValueError, KeyError): pass
 
 
 

@@ -8,6 +8,7 @@ PARSERS_CODE = {
     0x01: '_no_return_parser',
 
     0x13: 'mission_status_parser',
+    0x15: 'boolean_parser',
 
     0x61: 'boolean_parser',
     0x62: 'aircraft_location',
@@ -67,7 +68,7 @@ def double_parser(data):
     return struct.unpack('>d', data)
 
 def boolean_parser(data):
-    return struct.unpack('>b', data)
+    return struct.unpack('>?', data)
 
 def int_parser(data):
     return struct.unpack('>i', data)
